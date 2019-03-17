@@ -11,55 +11,56 @@ import 'package:image/image.dart' as DartImage;
 import 'package:breez/bloc/account/account_model.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
-class PaymentRequestDialog extends StatefulWidget {
+class AnimatedPaymentRequestDialog extends StatefulWidget {
   final BuildContext context;
   final AccountBloc accountBloc;
   final PaymentRequestModel invoice;
   final _transparentImage = DartImage.encodePng(DartImage.Image(300, 300));
 
-  PaymentRequestDialog(this.context, this.accountBloc, this.invoice);
+  AnimatedPaymentRequestDialog(this.context, this.accountBloc, this.invoice);
 
   @override
   State<StatefulWidget> createState() {
-    return PaymentRequestDialogState();
+    return AnimatedPaymentRequestDialogState();
   }
 }
 
-class PaymentRequestDialogState extends State<PaymentRequestDialog> {
+class AnimatedPaymentRequestDialogState
+    extends State<AnimatedPaymentRequestDialog> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController _invoiceAmountController = new TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _invoiceAmountController.addListener((){
+    _invoiceAmountController.addListener(() {
       setState(() {});
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return showPaymentRequestDialog();
+    return showAnimatedPaymentRequestDialog();
   }
 
-  Widget showPaymentRequestDialog() {
+  Widget showAnimatedPaymentRequestDialog() {
     return new AlertDialog(
       titlePadding: EdgeInsets.only(top: 48.0),
       title: widget.invoice.payeeImageURL.isEmpty
           ? null
           : Stack(alignment: Alignment(0.0, 0.0), children: <Widget>[
-        CircularProgressIndicator(),
-        ClipOval(
-          child: FadeInImage(
-              width: 64.0,
-              height: 64.0,
-              placeholder: MemoryImage(widget._transparentImage),
-              image: AdvancedNetworkImage(widget.invoice.payeeImageURL,
-                  useDiskCache: true),
-              fadeOutDuration: new Duration(milliseconds: 200),
-              fadeInDuration: new Duration(milliseconds: 200)),
-        )
-      ]),
+              CircularProgressIndicator(),
+              ClipOval(
+                child: FadeInImage(
+                    width: 64.0,
+                    height: 64.0,
+                    placeholder: MemoryImage(widget._transparentImage),
+                    image: AdvancedNetworkImage(widget.invoice.payeeImageURL,
+                        useDiskCache: true),
+                    fadeOutDuration: new Duration(milliseconds: 200),
+                    fadeInDuration: new Duration(milliseconds: 200)),
+              )
+            ]),
       contentPadding: EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 16.0),
       content: StreamBuilder<AccountModel>(
         stream: widget.accountBloc.accountStream,
@@ -99,14 +100,15 @@ class PaymentRequestDialogState extends State<PaymentRequestDialog> {
     return widget.invoice.payeeName == null
         ? null
         : Text(
-      "${widget.invoice.payeeName}",
-      style: theme.paymentRequestTitleStyle,
-      textAlign: TextAlign.center,
-    );
+            "${widget.invoice.payeeName}",
+            style: theme.paymentRequestTitleStyle,
+            textAlign: TextAlign.center,
+          );
   }
 
   Widget _buildErrorMessage(AccountModel account) {
-    String validationError = account.validateOutgoingPayment(amountToPay(account));
+    String validationError =
+        account.validateOutgoingPayment(amountToPay(account));
     if (validationError == null || widget.invoice.amount == 0) {
       return null;
     }
@@ -123,15 +125,15 @@ class PaymentRequestDialogState extends State<PaymentRequestDialog> {
   Widget _buildRequestPayTextWidget() {
     return widget.invoice.payeeName == null || widget.invoice.payeeName.isEmpty
         ? new Text(
-      "You are requested to pay:",
-      style: theme.paymentRequestSubtitleStyle,
-      textAlign: TextAlign.center,
-    )
+            "You are requested to pay:",
+            style: theme.paymentRequestSubtitleStyle,
+            textAlign: TextAlign.center,
+          )
         : new Text(
-      "is requesting you to pay:",
-      style: theme.paymentRequestSubtitleStyle,
-      textAlign: TextAlign.center,
-    );
+            "is requesting you to pay:",
+            style: theme.paymentRequestSubtitleStyle,
+            textAlign: TextAlign.center,
+          );
   }
 
   Widget _buildAmountWidget(AccountModel account) {
@@ -155,8 +157,7 @@ class PaymentRequestDialogState extends State<PaymentRequestDialog> {
                 currency: account.currency,
                 controller: _invoiceAmountController,
                 decoration: new InputDecoration(
-                    labelText: account.currency.displayName +
-                        " Amount"),
+                    labelText: account.currency.displayName + " Amount"),
               ),
             ),
           ),
@@ -171,19 +172,20 @@ class PaymentRequestDialogState extends State<PaymentRequestDialog> {
   }
 
   Widget _buildDescriptionWidget() {
-    return widget.invoice.description == null || widget.invoice.description.isEmpty
+    return widget.invoice.description == null ||
+            widget.invoice.description.isEmpty
         ? null
         : Padding(
-      padding: EdgeInsets.only(top: 8.0, left: 16.0, right: 16.0),
-      child: AutoSizeText(
-        widget.invoice.description,
-        style: theme.paymentRequestSubtitleStyle,
-        textAlign: widget.invoice.description.length > 40
-            ? TextAlign.justify
-            : TextAlign.center,
-        maxLines: 3,
-      ),
-    );
+            padding: EdgeInsets.only(top: 8.0, left: 16.0, right: 16.0),
+            child: AutoSizeText(
+              widget.invoice.description,
+              style: theme.paymentRequestSubtitleStyle,
+              textAlign: widget.invoice.description.length > 40
+                  ? TextAlign.justify
+                  : TextAlign.center,
+              maxLines: 3,
+            ),
+          );
   }
 
   Widget _buildActions(AccountModel account) {
@@ -199,25 +201,32 @@ class PaymentRequestDialogState extends State<PaymentRequestDialog> {
       actions.add(SimpleDialogOption(
         onPressed: (() async {
           if (widget.invoice.amount > 0 || _formKey.currentState.validate()) {
-
             if (widget.invoice.amount == 0) {
-              TextStyle textStyle = theme.alertStyle;//TextStyle(color: Colors.black).copyWith(fontSize: 16.0);
+              TextStyle textStyle = theme
+                  .alertStyle; //TextStyle(color: Colors.black).copyWith(fontSize: 16.0);
               String exitSessionMessage = 'Are you sure you want to pay ';
               RichText content = RichText(
-                  text: TextSpan(style: textStyle,
+                  text: TextSpan(
+                      style: textStyle,
                       text: exitSessionMessage,
-                      children:<TextSpan>[
-                        TextSpan(text: "${account.currency.format(amountToPay(account))}", style: textStyle.copyWith(fontWeight: FontWeight.bold)),
-                        TextSpan(text: "?")
-                      ]));
+                      children: <TextSpan>[
+                    TextSpan(
+                        text:
+                            "${account.currency.format(amountToPay(account))}",
+                        style: textStyle.copyWith(fontWeight: FontWeight.bold)),
+                    TextSpan(text: "?")
+                  ]));
 
               Navigator.pop(context);
-              bool sure = await promptAreYouSure(context, null, content, textStyle: theme.buttonStyle);
+              bool sure = await promptAreYouSure(context, null, content,
+                  textStyle: theme.buttonStyle);
               if (sure) {
-                widget.accountBloc.sentPaymentsSink.add(PayRequest(widget.invoice.rawPayReq, amountToPay(account)));
+                widget.accountBloc.sentPaymentsSink.add(
+                    PayRequest(widget.invoice.rawPayReq, amountToPay(account)));
               }
             } else {
-              widget.accountBloc.sentPaymentsSink.add(PayRequest(widget.invoice.rawPayReq, amountToPay(account)));
+              widget.accountBloc.sentPaymentsSink.add(
+                  PayRequest(widget.invoice.rawPayReq, amountToPay(account)));
               Navigator.pop(context);
             }
           }
