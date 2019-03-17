@@ -10,6 +10,9 @@ import 'package:flutter_advanced_networkimage/flutter_advanced_networkimage.dart
 import 'package:image/image.dart' as DartImage;
 import 'package:breez/bloc/account/account_model.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:breez/widgets/animated_payment_request_dialog.dart';
+
+enum PaymentRequestState { APPROVED }
 
 class PaymentRequestDialog extends StatefulWidget {
   final BuildContext context;
@@ -28,6 +31,7 @@ class PaymentRequestDialog extends StatefulWidget {
 class PaymentRequestDialogState extends State<PaymentRequestDialog> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController _invoiceAmountController = new TextEditingController();
+  PaymentRequestState _status;
 
   @override
   void initState() {
@@ -38,8 +42,18 @@ class PaymentRequestDialogState extends State<PaymentRequestDialog> {
   }
 
   @override
+  dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return showPaymentRequestDialog();
+    switch (_status) {
+      case PaymentRequestState.APPROVED:
+        return ProceedPaymentAnimation();
+      default:
+        return showPaymentRequestDialog();
+    }
   }
 
   Widget showPaymentRequestDialog() {
@@ -189,7 +203,12 @@ class PaymentRequestDialogState extends State<PaymentRequestDialog> {
   Widget _buildActions(AccountModel account) {
     List<Widget> actions = [
       SimpleDialogOption(
-        onPressed: () => Navigator.pop(context),
+        onPressed: () {
+          setState(() {
+            _status = null;
+          });
+          //Navigator.pop(context);
+        },
         child: new Text("CANCEL", style: theme.buttonStyle),
       )
     ];
@@ -217,8 +236,12 @@ class PaymentRequestDialogState extends State<PaymentRequestDialog> {
                 widget.accountBloc.sentPaymentsSink.add(PayRequest(widget.invoice.rawPayReq, amountToPay(account)));
               }
             } else {
-              widget.accountBloc.sentPaymentsSink.add(PayRequest(widget.invoice.rawPayReq, amountToPay(account)));
-              Navigator.pop(context);
+              widget.accountBloc.sentPaymentsSink.add(
+                  PayRequest(widget.invoice.rawPayReq, amountToPay(account)));
+              setState(() {
+                _status = null;
+              });
+              //Navigator.pop(context);
             }
           }
         }),
