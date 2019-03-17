@@ -40,14 +40,14 @@ class PaymentRequestDialogState extends State<PaymentRequestDialog>
   void initState() {
     super.initState();
     controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+        AnimationController(vsync: this, duration: Duration(milliseconds: 400));
     borderAnimation = Tween<double>(begin: 0.0, end: 8.0).animate(
         CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn));
     opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
         CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn));
     transitionAnimation = new RelativeRectTween(
-        begin: new RelativeRect.fromLTRB(0.0, 276.0, 0.0, 374.0),
-        end: new RelativeRect.fromLTRB(32.0, 246.0, 32.0, 206.0))
+        begin: new RelativeRect.fromLTRB(16.0, 290.0, 16.0, 390.0),
+        end: new RelativeRect.fromLTRB(16.0, 246.0, 16.0, 216.0))
         .animate(controller);
     colorAnimation = new ColorTween(
       begin: theme.BreezColors.blue[500],
@@ -56,15 +56,7 @@ class PaymentRequestDialogState extends State<PaymentRequestDialog>
       ..addListener(() {
         setState(() {});
       });
-
     controller.forward();
-    controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        //return Timer(Duration(seconds: 2), () => controller.reverse());
-      } else if (status == AnimationStatus.dismissed) {
-        //return Timer(Duration(seconds: 5), () => controller.forward());
-      }
-    });
 
     _invoiceAmountController.addListener(() {
       setState(() {});
